@@ -31,6 +31,58 @@ def start_game():
     return matrix
 
 
+def play_game(matrix):
+    while True:
+        # taking user input
+        x = input("Press the command: ")
+
+        # update matrix according to the move
+        if x == 'w':
+            matrix, changed = move_up(matrix)
+        elif x == 's':
+            matrix, changed = move_down(matrix)
+        elif x == 'a':
+            matrix, changed = move_left(matrix)
+        elif x == 'd':
+            matrix, changed = move_right(matrix)
+        else:
+            print("Invalid Key")
+
+        # print the matrix after each move
+        print(matrix[0])
+        print(matrix[1])
+        print(matrix[2])
+        print(matrix[3])
+
+        # get the current game status
+        status = get_current_state(matrix)
+
+        # if game not over, then add a new cell
+        if status == 'continue':
+            insert_new(matrix)
+
+        # else break the loop and prompt end game
+        else:
+            print(status)
+            if restart():
+                print("Starting new game")
+                play_game(start_game())
+            if not restart():
+                break
+
+
+# generate end game options
+def restart():
+    result = input("Restart the game? (yes/no)  ")
+    if result == 'yes':
+        return True
+    elif result == 'no':
+        return False
+    else:
+        print("Invalid input!")
+        restart()
+
+
 # generate a new random 2 for an empty cell
 def insert_new(matrix):
     # generate the row and column number of a random cell
@@ -42,7 +94,7 @@ def insert_new(matrix):
         r = random.randint(0, 3)
         c = random.randint(0, 3)
 
-    # replace the empty cell as 2
+    # replace the empty cell as 2 (edit matrix in place)
     matrix[r][c] = 2
 
 
@@ -54,19 +106,13 @@ def get_current_state(matrix):
             if matrix[i][j] == 2048:
                 return 'YOU WON!'
 
-    # game continues if there is still at least one empty cell
+    # continue if there is still at least one empty cell
+    # and lost if there's none
     for i in range(4):
         for j in range(4):
             if matrix[i][j] == 0:
                 return 'continue'
 
-    # or if no cell is empty now but two cells nearby could merge
-    for i in range(3):
-        for j in range(3):
-            if matrix[i][j] == matrix[i + 1][j] or matrix[i][j] == matrix[i][j + 1]:
-                return 'continue'
-
-    # else, lost the game
     return 'YOU LOST :('
 
 
